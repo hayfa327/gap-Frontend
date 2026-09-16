@@ -1,0 +1,234 @@
+/* src/pages/Exhibitions/Exhibitions.css */
+
+.exhibitionsPage {
+  background: var(--color-background);
+  min-height: 60vh;
+  padding: var(--space-xl);
+}
+
+.exhibitionsHeader {
+  max-width: 640px;
+  margin-bottom: var(--space-xl);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.pageTitle {
+  font-family: var(--font-heading);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--color-text);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.pageSubtitle {
+  font-size: var(--text-body);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.stateMsg {
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+
+.exhibitionsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl) var(--space-lg);
+}
+
+@media (min-width: 700px) {
+  .exhibitionsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.exhibitionCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.exhibitionCardImage {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.exhibitionCardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.exhibitionCard:hover .exhibitionCardImage img {
+  transform: scale(1.03);
+}
+
+.exhibitionCard h3 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0 0 4px 0;
+}
+
+.exhibitionCardArtist {
+  font-size: var(--text-body);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.exhibitionCardDate {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 4px 0 0 0;
+}
+
+/* --------------------------------------------------------------------------
+   Edit / Delete actions on each card (admin, or the owning artist)
+   -------------------------------------------------------------------------- */
+
+.exhibitionCardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cardActions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.cardEditBtn,
+.cardDeleteBtn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.cardEditBtn {
+  background: var(--color-text);
+  color: var(--color-on-image);
+  border: none;
+}
+
+.cardEditBtn:hover {
+  opacity: 0.85;
+}
+
+.cardDeleteBtn {
+  background: var(--color-background);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+}
+
+.cardDeleteBtn:hover:not(:disabled) {
+  background: var(--color-error-bg);
+}
+
+.cardDeleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   Search bar
+   -------------------------------------------------------------------------- */
+
+.exhibitionsHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-lg);
+}
+
+.exhibitionsHeaderText {
+  max-width: 640px;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.searchBox input {
+  height: 44px;
+  min-width: 220px;
+  padding-inline: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-background);
+  font-size: 14px;
+  font-family: var(--font-body);
+}
+
+.searchBox input:focus {
+  outline: none;
+  border-color: var(--color-ring);
+}
+
+.searchBtn,
+.resetBtn {
+  height: 44px;
+  padding-inline: var(--space-lg);
+  border-radius: 999px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.searchBtn {
+  background: var(--color-text);
+  color: var(--color-on-image);
+}
+
+.searchBtn:hover {
+  opacity: 0.85;
+}
+
+.resetBtn {
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.resetBtn:hover {
+  background: var(--color-muted);
+}
+
+@media (max-width: 700px) {
+  .exhibitionsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .searchBox {
+    width: 100%;
+  }
+
+  .searchBox input {
+    flex: 1;
+  }
+}

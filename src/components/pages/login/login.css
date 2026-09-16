@@ -1,0 +1,217 @@
+/* src/pages/Login/Login.css */
+
+.authPage {
+  background: var(--color-background);
+  min-height: calc(100vh - 73px);
+}
+
+.authGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1000px) {
+  .authGrid {
+    grid-template-columns: 1fr 1fr;
+    min-height: calc(100vh - 73px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Left column
+   -------------------------------------------------------------------------- */
+
+.authColumn {
+  padding: var(--space-xl) var(--space-xl) var(--space-xl) var(--space-xl);
+  max-width: 560px;
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.authHero {
+  font-family: var(--font-heading);
+  font-size: var(--text-hero);
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+/* --------------------------------------------------------------------------
+   Form
+   -------------------------------------------------------------------------- */
+
+.errorMsg {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body);
+  margin-bottom: var(--space-md);
+}
+
+.inputGroup {
+  margin-bottom: var(--space-md);
+}
+
+.inputGroup label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.inputGroup input {
+  width: 100%;
+  height: 52px;
+  padding-inline: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+  font-size: var(--text-body);
+  font-family: var(--font-body);
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: var(--color-ring);
+}
+
+.primaryBtn {
+  width: 100%;
+  height: 52px;
+  background: var(--color-text);
+  color: var(--color-on-image);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body);
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: var(--space-sm);
+  transition: opacity 0.15s ease;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.primaryBtn:disabled {
+  background: var(--color-muted);
+  color: var(--color-muted-foreground);
+  cursor: not-allowed;
+}
+
+.inlineLink {
+  margin-top: var(--space-md);
+  font-size: var(--text-body);
+  color: var(--color-text-muted);
+}
+
+.inlineLink a {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   Divider
+   -------------------------------------------------------------------------- */
+
+.authDivider {
+  border-top: 1px solid var(--color-border);
+  margin-block: var(--space-lg);
+}
+
+/* --------------------------------------------------------------------------
+   Demo cards
+   -------------------------------------------------------------------------- */
+
+.demoIntro {
+  font-size: var(--text-body);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.demoCards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.demoCard {
+  text-align: left;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+  padding: var(--space-md);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.demoCard:hover:not(:disabled) {
+  border-color: var(--color-ring);
+  background: var(--color-secondary);
+}
+
+.demoCard:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.demoCardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.demoCardHead h3 {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.demoCardHead span {
+  color: var(--color-text-muted);
+  font-size: 18px;
+}
+
+.demoCard p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: var(--space-xs) 0;
+}
+
+.demoEmail {
+  display: block;
+  font-size: 13px;
+  color: var(--color-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Right column — full-height image
+   -------------------------------------------------------------------------- */
+
+.authImage {
+  background-size: cover;
+  background-position: center;
+  min-height: 320px;
+}
+
+@media (min-width: 1000px) {
+  .authImage {
+    min-height: auto;
+  }
+}

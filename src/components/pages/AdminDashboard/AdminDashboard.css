@@ -1,0 +1,119 @@
+/* src/pages/AdminDashboard/AdminDashboard.css */
+
+.adminPage {
+  background: var(--color-background);
+  padding: var(--space-xl);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.pageTitle {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.pageSubtitle {
+  font-size: var(--text-body);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-xl) 0;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (min-width: 700px) {
+  .cardGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.dashCard {
+  text-align: left;
+  background: var(--color-secondary);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.dashCard:hover {
+  background: var(--color-muted);
+}
+
+.dashCard h3 {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.dashCard p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sectionDivider {
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-xl) 0;
+}
+
+.statsTitle {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (min-width: 700px) {
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.statCard {
+  background: var(--color-secondary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg);
+}
+
+.statValue {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 40px;
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+.statLabel {
+  display: block;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+}

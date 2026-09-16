@@ -1,0 +1,235 @@
+/* src/pages/Performances/Performances.css */
+
+.performancesPage {
+  background: var(--color-background);
+  min-height: 60vh;
+  padding: var(--space-xl);
+}
+
+.performancesPageHeader {
+  max-width: 560px;
+  margin-bottom: var(--space-xl);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.pageTitle {
+  font-family: var(--font-heading);
+  font-size: clamp(48px, 7vw, 80px);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-text);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.pageSubtitle {
+  font-size: var(--text-body);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.stateMsg {
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+
+/* --------------------------------------------------------------------------
+   Full-width hero image (no caption — purely visual)
+   -------------------------------------------------------------------------- */
+
+.performanceHeroImage {
+  width: 100%;
+  aspect-ratio: 16 / 8;
+  overflow: hidden;
+  background: var(--color-muted);
+  margin-bottom: var(--space-xl);
+}
+
+.performanceHeroImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Masonry rows: one large card (left) + up to two stacked cards (right)
+   -------------------------------------------------------------------------- */
+
+.perfMasonryRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+@media (min-width: 900px) {
+  .perfMasonryRow {
+    grid-template-columns: 1.4fr 1fr;
+  }
+}
+
+.perfStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.perfCardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.perfCardImage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.perfCardFeatured .perfCardImage {
+  aspect-ratio: 4 / 3.6;
+}
+
+.perfCardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.perfCard:hover .perfCardImage img {
+  transform: scale(1.03);
+}
+
+.livePill {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.perfType {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.perfCard h3 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0 0 4px 0;
+}
+
+.perfCardFeatured h3 {
+  font-size: 28px;
+}
+
+.perfArtist {
+  font-size: var(--text-body);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.perfMeta {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 4px 0 0 0;
+}
+
+/* --------------------------------------------------------------------------
+   Edit / Delete actions
+   -------------------------------------------------------------------------- */
+
+.cardActions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.cardEditBtn,
+.cardDeleteBtn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.cardEditBtn {
+  background: var(--color-text);
+  color: var(--color-on-image);
+  border: none;
+}
+
+.cardEditBtn:hover {
+  opacity: 0.85;
+}
+
+.cardDeleteBtn {
+  background: var(--color-background);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+}
+
+.cardDeleteBtn:hover:not(:disabled) {
+  background: var(--color-error-bg);
+}
+
+.cardDeleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   Filter tabs (All / Performances / Concerts)
+   -------------------------------------------------------------------------- */
+
+.filterTabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.filterTab {
+  height: 40px;
+  padding-inline: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.filterTabActive {
+  background: var(--color-text);
+  color: var(--color-on-image);
+  border-color: var(--color-text);
+}

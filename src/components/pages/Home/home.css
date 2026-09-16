@@ -1,0 +1,156 @@
+/* src/pages/Home.css */
+
+/* --------------------------------------------------------------------------
+   Hero section
+   -------------------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  min-height: 85vh;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+/* Dark gradient so white text stays readable over any part of the photo */
+.hero::before,
+.heroOverlay {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.75) 0%,
+    rgba(0, 0, 0, 0.35) 40%,
+    rgba(0, 0, 0, 0.1) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative; /* sits above .heroOverlay */
+  z-index: 1;
+  padding: var(--space-xl);
+  max-width: 900px;
+  width: 100%;
+}
+
+/* Small "LIVE NOW" pill, top-left over the image */
+.heroLivePill {
+  position: absolute;
+  top: var(--space-lg);
+  left: var(--space-xl);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-on-image);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.heroLivePill .live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-live-dot);
+}
+
+/* Location label, top-right over the image */
+.heroLocation {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-xl);
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-on-image);
+}
+
+.heroEyebrow {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-on-image-muted);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+/* --------------------------------------------------------------------------
+   "Enter live" button + caption row, under the title
+   -------------------------------------------------------------------------- */
+
+.heroFooter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.heroLiveBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--color-on-image);
+  color: var(--color-text);
+  border: none;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.heroLiveBtn:hover {
+  opacity: 0.85;
+}
+
+.heroPlayIcon {
+  font-size: 11px;
+}
+
+.heroLiveInfo p {
+  margin: 0;
+  color: var(--color-on-image);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.heroLiveSub {
+  color: var(--color-on-image-muted) !important;
+  font-size: 13px !important;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .hero {
+    min-height: 70vh;
+  }
+
+  .heroContent {
+    padding: var(--space-lg);
+  }
+
+  .heroLivePill,
+  .heroLocation {
+    left: var(--space-lg);
+    right: var(--space-lg);
+  }
+}

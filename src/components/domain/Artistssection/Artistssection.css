@@ -1,0 +1,112 @@
+/* src/components/domain/ArtistsSection/ArtistsSection.css */
+
+.artistsSection {
+  padding: var(--space-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+.artistsHeader {
+  position: relative;
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-lg);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.viewAllLink {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.viewAllLink:hover {
+  color: var(--color-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Grid
+   -------------------------------------------------------------------------- */
+
+.artistsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl) var(--space-lg);
+}
+
+@media (min-width: 700px) {
+  .artistsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.artistCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.artistCardImage {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--color-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.artistCardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Starts desaturated; the hover rule below brings colour back in,
+     the same effect used across the reference design's artist grids. */
+  filter: grayscale(100%);
+  transition: filter 0.5s ease, transform 0.5s ease;
+}
+
+.artistCard:hover .artistCardImage img {
+  filter: grayscale(0%);
+  transform: scale(1.03);
+}
+
+.artistCard h3 {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0 0 4px 0;
+}
+
+.artistLocation {
+  font-size: 13px;
+  color: var(--color-accent);
+  margin: 0;
+}
+
+.artistDiscipline {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 2px 0 0 0;
+}
