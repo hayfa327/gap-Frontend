@@ -5,6 +5,9 @@ import heroImage from '../../../assets/herotitle.jpeg';
 import { CurrentExhibition } from '../../domain/CurrentExhibition/CurrentExhibition';
 import { PerformancesSection } from '../../domain/PerformanceSection/PerformanceSection';  
 import { ArtistsSection } from '../../domain/Artistssection/Artistssection';
+import { KidsCornerSection } from '../../domain/Kidscornersection/KidsCornerSection';
+
+
 
 import "./home.css"
 
@@ -35,6 +38,7 @@ import "./home.css"
 <CurrentExhibition />
   <PerformancesSection />
     <ArtistsSection />
+    <KidsCornerSection />
 
       <Footer />
     </>
