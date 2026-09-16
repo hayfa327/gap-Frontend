@@ -72,7 +72,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Account dropdown
+   Account dropdown (desktop)
    -------------------------------------------------------------------------- */
 
 .nav-account {
@@ -137,9 +137,113 @@
   color: var(--color-error);
 }
 
-/* Collapse nav links on small screens — a real mobile menu can replace this later */
+/* --------------------------------------------------------------------------
+   Hamburger button (mobile only)
+   -------------------------------------------------------------------------- */
+
+.nav-burger {
+  display: none;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.nav-burger span {
+  display: block;
+  position: absolute;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--color-text);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.2s ease, top 0.3s ease;
+}
+
+/* Resting position: three stacked lines */
+.nav-burger span:nth-child(1) { top: 10px; }
+.nav-burger span:nth-child(2) { top: 16px; }
+.nav-burger span:nth-child(3) { top: 22px; }
+
+/* Open position: lines rotate and merge into an X */
+.nav-burger-open span:nth-child(1) {
+  top: 16px;
+  transform: rotate(45deg);
+}
+
+.nav-burger-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-burger-open span:nth-child(3) {
+  top: 16px;
+  transform: rotate(-45deg);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile full-screen menu
+   -------------------------------------------------------------------------- */
+
+.nav-mobile-menu {
+  position: fixed;
+  inset: 0;
+  top: 73px; /* sits below the nav bar itself */
+  background: var(--color-background);
+  padding: var(--space-xl);
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.nav-mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.nav-mobile-link {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.nav-mobile-divider {
+  border-top: 1px solid var(--color-border);
+  margin-block: var(--space-xl);
+}
+
+.nav-mobile-account-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.nav-mobile-account .nav-dropdown-item {
+  font-size: 16px;
+  padding: var(--space-md) 0;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive switch: desktop nav <-> hamburger
+   -------------------------------------------------------------------------- */
+
 @media (max-width: 900px) {
-  .nav-links {
+  .nav-links,
+  .nav-account {
     display: none;
+  }
+
+  .nav-burger {
+    display: flex;
   }
 }
