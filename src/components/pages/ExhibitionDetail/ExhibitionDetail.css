@@ -126,3 +126,24 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* --------------------------------------------------------------------------
+   Enter 3D Gallery button
+   -------------------------------------------------------------------------- */
+
+.enter3dBtn {
+  display: inline-block;
+  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-accent);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.enter3dBtn:hover {
+  opacity: 0.85;
+}

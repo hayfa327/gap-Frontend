@@ -41,7 +41,7 @@ export default function ExhibitionDetail() {
   useEffect(() => {
     const fetchExhibition = async () => {
       try {
-        const res = await fetch(`${API_BASE}/exhibitions/${id}`);
+     const res = await fetch(`${API_BASE}/exhibitions/exhibitions/${id}`);
         if (!res.ok) throw new Error('Exhibition not found');
         const data = await res.json();
         setExhibition(data.exhibition || data);
@@ -64,7 +64,7 @@ export default function ExhibitionDetail() {
     const token = localStorage.getItem('token');
     setDeleting(true);
     try {
-      const res = await fetch(`${API_BASE}/exhibitions/exhibitions/${id}`, {
+      const res = await fetch(`${API_BASE}/exhibitions/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -127,8 +127,9 @@ export default function ExhibitionDetail() {
               )}
             </div>
 
-            {/* Placeholder for the future Three.js walkthrough entry point */}
-            {/* <button className="enter3dBtn">Enter 3D Gallery</button> */}
+            <Link to={`/exhibitions/${exhibition._id}/gallery`} className="enter3dBtn">
+              Enter 3D Gallery ↗
+            </Link>
           </>
         )}
       </section>

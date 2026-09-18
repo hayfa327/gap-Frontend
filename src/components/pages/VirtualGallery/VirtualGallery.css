@@ -1,0 +1,27 @@
+/* src/components/pages/VirtualGallery/VirtualGallery.css */
+
+.galleryViewport {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #111;
+}
+
+.galleryViewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.galleryHint {
+  position: absolute;
+  bottom: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  pointer-events: none;
+}
