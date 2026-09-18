@@ -5,7 +5,7 @@ import heroImage from '../../../assets/herotitle.jpeg';
 import { CurrentExhibition } from '../../domain/CurrentExhibition/CurrentExhibition';
 import { PerformancesSection } from '../../domain/PerformanceSection/PerformanceSection';  
 import { ArtistsSection } from '../../domain/Artistssection/Artistssection';
-import { KidsCornerSection } from '../../domain/Kidscornersection/KidsCornerSection';
+import { KidsCornerSection } from '../../domain/Kidscornersection/Kidscornersection';
 
 
 

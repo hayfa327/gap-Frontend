@@ -1,0 +1,262 @@
+/* src/components/pages/KidsCorner/games/ArtistQuizGame.css */
+
+.quizGame { max-width: 100%; }
+
+/* --------------------------------------------------------------------------
+   Progress dots
+   -------------------------------------------------------------------------- */
+
+.progressDots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--space-lg);
+}
+
+.progressDot {
+  width: 28px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+
+.progressDotActive {
+  background: var(--color-error);
+}
+
+/* --------------------------------------------------------------------------
+   Body layout: artwork + question
+   -------------------------------------------------------------------------- */
+
+.quizBody {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 600px) {
+  .quizBody {
+    grid-template-columns: 1fr 1.2fr;
+  }
+}
+
+.artworkFrame {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+
+.artworkSvg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.artworkCaption {
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--color-text-muted);
+  margin: var(--space-xs) 0 0 0;
+}
+
+.quizQuestion {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--color-text);
+  margin: 0 0 var(--space-md) 0;
+}
+
+/* --------------------------------------------------------------------------
+   Options
+   -------------------------------------------------------------------------- */
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.optionBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 48px;
+  padding-inline: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+}
+
+.optionBtn:hover:not(:disabled) {
+  border-color: var(--color-ring);
+  transform: translateX(2px);
+}
+
+.optionBtn:disabled {
+  cursor: default;
+}
+
+.optionLetter {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.optionText {
+  flex: 1;
+}
+
+.optionIcon {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.optionCorrect {
+  background: #E4F5EC;
+  border-color: #5FBF9F;
+}
+
+.optionCorrect .optionLetter {
+  background: #5FBF9F;
+  color: white;
+}
+
+.optionCorrect .optionIcon {
+  color: #2E9E6E;
+}
+
+.optionWrong {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+}
+
+.optionWrong .optionLetter {
+  background: var(--color-error);
+  color: white;
+}
+
+.optionWrong .optionIcon {
+  color: var(--color-error);
+}
+
+/* --------------------------------------------------------------------------
+   Feedback
+   -------------------------------------------------------------------------- */
+
+.feedbackBox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-kids);
+  border: 1px solid #E8DFA8;
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.feedbackIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.feedbackBox > div {
+  flex: 1;
+  min-width: 200px;
+}
+
+.feedbackVerdict {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 0 0 4px 0;
+}
+
+.feedbackFact {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.primaryBtnSmall {
+  height: 40px;
+  padding-inline: var(--space-md);
+  border: none;
+  border-radius: 999px;
+  background: var(--color-text);
+  color: var(--color-on-image);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.primaryBtnSmall:hover {
+  opacity: 0.85;
+}
+
+.feedbackNextBtn {
+  align-self: flex-end;
+}
+
+/* --------------------------------------------------------------------------
+   Finish screen
+   -------------------------------------------------------------------------- */
+
+.quizFinish {
+  text-align: center;
+}
+
+.finishTitle {
+  font-family: var(--font-heading);
+  font-size: clamp(30px, 4vw, 42px);
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.finishScore {
+  font-size: var(--text-body);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-xl) 0;
+}
+
+.finishActions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.secondaryBtn {
+  height: 40px;
+  padding-inline: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-size: 13px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.secondaryBtn:hover {
+  border-color: var(--color-ring);
+}

@@ -13,8 +13,10 @@ import ChangePassword from './components/pages/ChangePassword/ChangePassword'
 import CreatePerformance from './components/pages/CreatePerformance/CreatePerformance'
 import Performances from './components/pages/Performances/Performances'
 import Artists from './components/pages/Artists/Artists'
-
+import KidsCorner from './components/pages/KidsCorner/KidsCorner'
  
+
+
 import './App.css'
 
 export default function App() {
@@ -31,6 +33,9 @@ export default function App() {
         <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/performances" element={<Performances />} />
           <Route path="/artists" element={<Artists />} />
+          <Route path="/kids-corner" element={<KidsCorner />} />
+        
+        
 
         <Route
   path="/admin-dashboard"

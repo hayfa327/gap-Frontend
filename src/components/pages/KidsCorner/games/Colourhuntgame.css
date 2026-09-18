@@ -1,0 +1,132 @@
+/* src/components/pages/KidsCorner/games/ColourHuntGame.css */
+
+.huntGame {
+  max-width: 100%;
+}
+
+.huntScore {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-lg);
+}
+
+.huntScore strong {
+  color: var(--color-text);
+}
+
+.huntPrompt {
+  font-family: var(--font-heading);
+  font-size: clamp(24px, 4vw, 34px);
+  font-weight: 400;
+  text-align: center;
+  color: var(--color-text);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+.huntColourWord {
+  font-weight: 600;
+}
+
+.colour-blue { color: #3E6FD9; }
+.colour-coral { color: #F26B6B; }
+.colour-yellow { color: #C89A1E; }
+.colour-mint { color: #3E9E7A; }
+
+.galleryRoom {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--color-secondary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.galleryObject {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border: none;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease, opacity 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.galleryObject:hover {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.shape-circle { border-radius: 50%; }
+.shape-square { border-radius: 6px; }
+.shape-triangle {
+  border-radius: 0;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.objShake {
+  animation: objShake 0.3s ease;
+}
+
+@keyframes objShake {
+  0%, 100% { transform: translate(-50%, -50%); }
+  25% { transform: translate(-54%, -50%); }
+  75% { transform: translate(-46%, -50%); }
+}
+
+.objFound {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.huntNote {
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-top: var(--space-md);
+}
+
+/* --------------------------------------------------------------------------
+   Finish state
+   -------------------------------------------------------------------------- */
+
+.huntFinish {
+  text-align: center;
+  padding: var(--space-xl) 0;
+}
+
+.huntFinishIcon {
+  font-size: 28px;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.huntFinish h3 {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0 0 4px 0;
+}
+
+.huntFinishScore {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+.primaryBtnSmall {
+  height: 44px;
+  padding-inline: var(--space-lg);
+  border: none;
+  border-radius: 999px;
+  background: var(--color-text);
+  color: var(--color-on-image);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.primaryBtnSmall:hover {
+  opacity: 0.85;
+}
