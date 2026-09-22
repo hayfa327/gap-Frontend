@@ -18,10 +18,87 @@
   bottom: var(--space-lg);
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.55);
   color: white;
   font-size: 13px;
   padding: 8px 16px;
   border-radius: 999px;
   pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Loading / error state, exit button
+   -------------------------------------------------------------------------- */
+
+.galleryLoading {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  background: var(--color-background);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.galleryBackLink {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.galleryExitBtn {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.galleryExitBtn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* --------------------------------------------------------------------------
+   Walk-mode hint
+   -------------------------------------------------------------------------- */
+
+.galleryWalkHint {
+  position: absolute;
+  top: var(--space-md);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Zoom step-back button
+   -------------------------------------------------------------------------- */
+
+.galleryZoomOutBtn {
+  position: absolute;
+  bottom: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+}
+
+.galleryZoomOutBtn:hover {
+  background: rgba(0, 0, 0, 0.85);
 }

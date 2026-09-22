@@ -1,9 +1,9 @@
-// src/pages/CreateExhibition/CreateExhibition.tsx
+// src/pages/EditExhibition/EditExhibition.tsx
 import { useState, useEffect, type SyntheticEvent, type ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Nav } from '../../domain/Nav/Nav';
 import { Footer } from '../../domain/Footer/Footer';
-import './Createexhibition.css';
+import './EditExhibition.css';
 
 interface Artist {
   _id: string;
@@ -64,7 +64,11 @@ async function uploadToCloudinary(file: File): Promise<string> {
   return data.secure_url as string;
 }
 
-export default function CreateExhibition() {
+export default function EditExhibition() {
+  const { id } = useParams<{ id: string }>();
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -92,6 +96,34 @@ export default function CreateExhibition() {
     };
     fetchArtists();
   }, []);
+
+  useEffect(() => {
+    const fetchExisting = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/exhibitions/exhibitions/${id}`);
+        if (!res.ok) throw new Error('not found');
+        const data = await res.json();
+        const ex = data.exhibition || data;
+
+        setTitle(ex.title || '');
+        setDescription(ex.description || '');
+        setStartDate(ex.startDate ? ex.startDate.slice(0, 10) : '');
+        setEndDate(ex.endDate ? ex.endDate.slice(0, 10) : '');
+        setArtistId(ex.artist?._id || ex.artist || '');
+        setImage(ex.image || '');
+        setPreview(ex.image || '');
+        setArtworks(ex.artworks || []);
+        if (ex.wallSettings?.length) setWallSettings(ex.wallSettings);
+      } catch (err) {
+        console.error(err);
+        setNotFound(true);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    if (id) fetchExisting();
+  }, [id]);
 
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,13 +174,13 @@ export default function CreateExhibition() {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/exhibitions/create`, {
-        method: 'POST',
+      const response = await fetch(`${API_BASE}/exhibitions/exhibitions/${id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, description, startDate, endDate, artistId, image, artworks, wallSettings }),
+        body: JSON.stringify({ title, description, startDate, endDate, artist: artistId, image, artworks, wallSettings }),
       });
 
       const data = await response.json();
@@ -158,14 +190,34 @@ export default function CreateExhibition() {
         return;
       }
 
-      navigate('/exhibitions');
+      navigate(`/exhibitions/${id}`);
     } catch (err) {
       console.error(err);
-      setError('Error creating exhibition');
+      setError('Error updating exhibition');
     } finally {
       setLoading(false);
     }
   };
+
+  if (initialLoading) {
+    return (
+      <>
+        <Nav />
+        <p className="stateMsg" style={{ padding: 'var(--space-xl)' }}>Loading exhibition...</p>
+        <Footer />
+      </>
+    );
+  }
+
+  if (notFound) {
+    return (
+      <>
+        <Nav />
+        <p className="stateMsg" style={{ padding: 'var(--space-xl)' }}>Exhibition not found.</p>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -174,8 +226,8 @@ export default function CreateExhibition() {
       <section className="createExhibitionPage">
         <div className="formContainer">
           <p className="eyebrow">Admin</p>
-          <h1 className="pageTitle">Create Exhibition</h1>
-          <p className="pageSubtitle">Add a new exhibition to the gallery collection</p>
+          <h1 className="pageTitle">Edit Exhibition</h1>
+          <p className="pageSubtitle">Update this exhibition's details and 3D gallery layout</p>
 
           {error && <p className="errorMsg">{error}</p>}
 
@@ -419,7 +471,7 @@ export default function CreateExhibition() {
               className="primaryBtn"
               disabled={!title || !description || !artistId || loading}
             >
-              {loading ? 'Creating...' : 'Create Exhibition'}
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </form>
         </div>

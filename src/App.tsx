@@ -15,6 +15,7 @@ import Performances from './components/pages/Performances/Performances'
 import Artists from './components/pages/Artists/Artists'
 import KidsCorner from './components/pages/KidsCorner/KidsCorner'
 import VirtualGallery from './components/pages/VirtualGallery/VirtualGallery'
+import EditExhibition from './components/pages/EditExhibition/EditExhibition'
  
 
 
@@ -36,6 +37,14 @@ export default function App() {
           <Route path="/artists" element={<Artists />} />
           <Route path="/kids-corner" element={<KidsCorner />} />
         <Route path="/exhibitions/:id/gallery" element={<VirtualGallery />} />
+        <Route
+  path="/exhibitions/:id/edit"
+  element={
+    <ProtectedRoute allowedRoles={['admin']}>
+      <EditExhibition />
+    </ProtectedRoute>
+  }
+/>
         
         
 

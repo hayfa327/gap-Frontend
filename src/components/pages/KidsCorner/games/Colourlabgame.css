@@ -1,0 +1,434 @@
+/* src/components/pages/KidsCorner/games/ColourLabGame.css */
+
+/* --------------------------------------------------------------------------
+   Layout: main mixing area + sidebar
+   -------------------------------------------------------------------------- */
+
+.labGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 900px) {
+  .labGrid {
+    grid-template-columns: 1.6fr 1fr;
+    align-items: start;
+  }
+}
+
+.labMain {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  border: 1px solid var(--color-border);
+}
+
+/* --------------------------------------------------------------------------
+   The dish
+   -------------------------------------------------------------------------- */
+
+.dishArea {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.dishWrap {
+  position: relative;
+  width: 240px;
+  margin: 0 auto;
+}
+
+.dish {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  margin: 0 auto var(--space-md) auto;
+  border-radius: 50%;
+  border: 8px solid var(--color-background);
+  box-shadow: 0 0 0 1px var(--color-border), inset 0 4px 14px rgba(0, 0, 0, 0.06), 0 14px 34px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: background-color 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dishSplash {
+  animation: splashPulse 0.35s ease;
+}
+
+.dish::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(139, 135, 196, 0);
+}
+
+.celebrateRing::after {
+  animation: ringPulse 1s ease-out;
+}
+
+@keyframes ringPulse {
+  0% { box-shadow: 0 0 0 0 rgba(139, 135, 196, 0.5); }
+  100% { box-shadow: 0 0 0 24px rgba(139, 135, 196, 0); }
+}
+
+@keyframes splashPulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.dishShine {
+  position: absolute;
+  top: 10%;
+  left: 16%;
+  width: 28%;
+  height: 18%;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  filter: blur(5px);
+}
+
+.dishHint {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  max-width: 60%;
+}
+
+.sparkles {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  pointer-events: none;
+}
+
+.sparkles span {
+  font-size: 22px;
+  animation: sparklePop 1.2s ease forwards;
+}
+
+.sparkles span:nth-child(2) { animation-delay: 0.1s; }
+.sparkles span:nth-child(3) { animation-delay: 0.2s; }
+
+.confettiBurst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.confettiPiece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: confettiFly 0.9s ease-out forwards;
+}
+
+@keyframes confettiFly {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--rot, 0deg)) translateY(0) scale(0.5);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--rot, 0deg)) translateY(-130px) scale(1) rotate(180deg);
+  }
+}
+
+@keyframes sparklePop {
+  0% { opacity: 0; transform: translateY(10px) scale(0.5); }
+  30% { opacity: 1; transform: translateY(-10px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-30px) scale(0.8); }
+}
+
+.resultName {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.resultNamePop {
+  animation: namePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes namePop {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.dropCount {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 4px 0 var(--space-md) 0;
+}
+
+.dishActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.secondaryBtn {
+  height: 40px;
+  padding-inline: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.secondaryBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.secondaryBtn:hover:not(:disabled) {
+  border-color: var(--color-ring);
+}
+
+.nameInputRow {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.nameInputRow input {
+  height: 40px;
+  padding-inline: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 13px;
+  width: 160px;
+}
+
+.nameInputRow input:focus {
+  outline: none;
+  border-color: var(--color-ring);
+}
+
+.primaryBtnSmall {
+  height: 40px;
+  padding-inline: var(--space-md);
+  border: none;
+  border-radius: 999px;
+  background: var(--color-text);
+  color: var(--color-on-image);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Pigment cards
+   -------------------------------------------------------------------------- */
+
+.pigmentCards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+@media (min-width: 500px) {
+  .pigmentCards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.pigmentCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-md) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease;
+}
+
+.pigmentCard:hover {
+  transform: translateY(-3px) scale(1.03);
+  border-color: var(--color-ring);
+}
+
+.pigmentCard:active {
+  transform: scale(0.96);
+}
+
+.pigmentCircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.pigmentName {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.pigmentCount {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar
+   -------------------------------------------------------------------------- */
+
+.labSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.sidebarPanel {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.sidebarPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.sidebarTitle {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.sidebarPanelHead .sidebarTitle {
+  margin: 0;
+}
+
+.questProgress {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.questList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.questItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.questItemDone {
+  background: var(--color-kids);
+}
+
+.questDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.questName {
+  flex: 1;
+}
+
+.questCheck {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.emptyHint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.swatchArchive {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.savedSwatch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+}
+
+.savedSwatchColor {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.savedSwatchName {
+  flex: 1;
+  font-size: 13px;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.savedSwatchDelete {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 6px;
+}
+
+.savedSwatchDelete:hover {
+  color: var(--color-error);
+}

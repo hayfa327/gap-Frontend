@@ -1,4 +1,4 @@
-/* src/pages/CreateExhibition/CreateExhibition.css */
+/* src/pages/EditExhibition/EditExhibition.css */
 
 .createExhibitionPage {
   background: var(--color-background);
@@ -279,48 +279,4 @@
 .wallSettingCount {
   font-size: 11px;
   color: var(--color-text-muted);
-}
-
-/* --------------------------------------------------------------------------
-   Dynamic wall add/remove controls
-   -------------------------------------------------------------------------- */
-
-.wallOrganizerHead {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-md);
-  margin-bottom: var(--space-md);
-}
-
-.addWallBtn {
-  height: 38px;
-  padding-inline: var(--space-md);
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: var(--color-text);
-  color: var(--color-on-image);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.addWallBtn:hover {
-  opacity: 0.85;
-}
-
-.removeWallBtn {
-  margin-top: var(--space-sm);
-  background: none;
-  border: none;
-  color: var(--color-error);
-  font-size: 12px;
-  cursor: pointer;
-  padding: 0;
-}
-
-.removeWallBtn:hover {
-  text-decoration: underline;
 }
