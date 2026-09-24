@@ -4,7 +4,8 @@ import { useParams, Link } from 'react-router-dom';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { PointerLockControls, useTexture, ContactShadows, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import './VirtualGallery.css';
+import "./VirtualGallery.css";
+
 
 const ROOM_WIDTH = 10;
 const ROOM_DEPTH = 10;
@@ -13,6 +14,7 @@ const DOORWAY_WIDTH = 2.4;
 const DOORWAY_HEIGHT = 3;
 const ART_HEIGHT = 1.6;
 const MAX_ROOMS = 8;
+const WALL_THICKNESS = 0.16; // real depth, not a flat plane
 
 // Every room continues straight back from the one before it — a single
 // corridor of connected rooms, same as before. (The turning/apartment
@@ -33,7 +35,45 @@ interface WallSetting {
   wallText: string;
   maxArtworks: number;
   textPosition?: 'top' | 'center' | 'bottom';
-  textSize?: 'small' | 'medium' | 'large';
+  textSize?: number; // exact point size, not a preset
+  textFont?: 'inter' | 'playfair' | 'merriweather' | 'mono';
+}
+
+// Each choice maps to a real, verified font file — troika-three-text
+// (which drei's <Text> uses) needs an actual font URL, not a CSS name.
+const FONT_URLS: Record<string, string> = {
+  inter: 'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-normal.woff',
+  playfair: 'https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5.0.20/files/playfair-display-latin-400-normal.woff',
+  merriweather: 'https://cdn.jsdelivr.net/npm/@fontsource/merriweather@5.0.13/files/merriweather-latin-400-normal.woff',
+  mono: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto-mono@5.0.18/files/roboto-mono-latin-400-normal.woff',
+};
+
+// A genuine bold weight for the exhibition title — real signage
+// contrasts the title against the body copy by WEIGHT, not just size.
+const FONT_URLS_BOLD: Record<string, string> = {
+  inter: 'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-700-normal.woff',
+  playfair: 'https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5.0.20/files/playfair-display-latin-700-normal.woff',
+  merriweather: 'https://cdn.jsdelivr.net/npm/@fontsource/merriweather@5.0.13/files/merriweather-latin-700-normal.woff',
+  mono: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto-mono@5.0.18/files/roboto-mono-latin-700-normal.woff',
+};
+
+// Picks readable dark-charcoal or light-ivory text depending on the
+// wall's own brightness — real museum signage is always high-contrast
+// against its wall, never a fixed colour regardless of the wall behind it.
+function getTextColors(wallHex: string): { title: string; body: string } {
+  const hex = wallHex.replace('#', '');
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance > 0.5
+    ? { title: '#1A1815', body: '#4A453E' } // dark charcoal on light walls
+    : { title: '#F5F2EA', body: '#C9C4B8' }; // warm ivory on dark walls
+}
+
+interface RoomData {
+  id: string;
+  walls: (WallSetting & { slot: 'far' | 'left' | 'right' })[];
 }
 
 interface Exhibition {
@@ -42,19 +82,21 @@ interface Exhibition {
   description?: string;
   image?: string;
   artworks?: ArtworkData[];
-  wallSettings?: WallSetting[];
+  rooms?: RoomData[]; // the proper hierarchy — new exhibitions save this
+  wallSettings?: WallSetting[]; // legacy flat array — older exhibitions only
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const FALLBACK_WALL: WallSetting = {
   id: 'wall-fallback',
-  color: '#EDEAE1',
+  color: '#F5F3EE',
   contentType: 'artOnly',
   wallText: '',
   maxArtworks: 6,
   textPosition: 'top',
-  textSize: 'medium',
+  textSize: 24,
+  textFont: 'inter',
 };
 
 // --------------------------------------------------------------------------
@@ -106,7 +148,7 @@ function useConcreteFloorTexture() {
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#C7C3B8';
+    ctx.fillStyle = '#C2BEB4'; // light-to-medium concrete grey
     ctx.fillRect(0, 0, size, size);
     for (let i = 0; i < 40; i++) {
       const x = Math.random() * size;
@@ -175,12 +217,12 @@ function useWallGrainTexture() {
       const x = Math.random() * size;
       const y = Math.random() * size;
       const shade = 115 + Math.random() * 30;
-      ctx.fillStyle = `rgba(${shade},${shade},${shade},0.05)`;
-      ctx.fillRect(x, y, 1, 1);
+      ctx.fillStyle = `rgba(${shade},${shade},${shade},0.16)`;
+      ctx.fillRect(x, y, 2, 2);
     }
     const tex = new THREE.CanvasTexture(canvas);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(5, 2.5);
+    tex.repeat.set(6, 3);
     return tex;
   });
   useEffect(() => () => texture.dispose(), [texture]);
@@ -199,13 +241,13 @@ function useWallBumpTexture() {
     for (let i = 0; i < 2500; i++) {
       const x = Math.random() * size;
       const y = Math.random() * size;
-      const v = 122 + Math.random() * 12;
+      const v = 90 + Math.random() * 75;
       ctx.fillStyle = `rgb(${v},${v},${v})`;
-      ctx.fillRect(x, y, 1, 1);
+      ctx.fillRect(x, y, 2, 2);
     }
     const tex = new THREE.CanvasTexture(canvas);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(5, 2.5);
+    tex.repeat.set(6, 3);
     return tex;
   });
   useEffect(() => () => texture.dispose(), [texture]);
@@ -234,6 +276,19 @@ interface RoomGroup {
   left: WallSetting;
   right: WallSetting;
   wallIndexOffset: number;
+}
+
+// Flattens the new rooms→walls hierarchy back into the same flat,
+// ordered array the rest of the renderer already expects (far, left,
+// right, far, left, right, ...) — this is the ONLY place that needs to
+// know about the new data shape; everything below is unchanged.
+function flattenRoomsData(rooms: RoomData[]): WallSetting[] {
+  return rooms.slice(0, MAX_ROOMS).flatMap((room) => {
+    const far = room.walls.find((w) => w.slot === 'far') || FALLBACK_WALL;
+    const left = room.walls.find((w) => w.slot === 'left') || FALLBACK_WALL;
+    const right = room.walls.find((w) => w.slot === 'right') || FALLBACK_WALL;
+    return [far, left, right];
+  });
 }
 
 function groupWallsIntoRooms(wallSettings: WallSetting[]): RoomGroup[] {
@@ -273,14 +328,17 @@ function RoomUnit({
   wallGrain: THREE.Texture;
   wallBump: THREE.Texture;
 }) {
+  // Explicit metalness={0} — painted plaster/concrete has essentially
+  // zero metallic response; leaving it implicit invited inconsistent
+  // defaults across Three.js versions.
   const farMat = (
-    <meshStandardMaterial color={group.far.color} roughnessMap={wallGrain} bumpMap={wallBump} bumpScale={0.006} roughness={0.92} />
+    <meshStandardMaterial color={group.far.color} roughnessMap={wallGrain} bumpMap={wallBump} bumpScale={0.035} roughness={0.92} metalness={0} />
   );
   const leftMat = (
-    <meshStandardMaterial color={group.left.color} roughnessMap={wallGrain} bumpMap={wallBump} bumpScale={0.006} roughness={0.92} />
+    <meshStandardMaterial color={group.left.color} roughnessMap={wallGrain} bumpMap={wallBump} bumpScale={0.035} roughness={0.92} metalness={0} />
   );
   const rightMat = (
-    <meshStandardMaterial color={group.right.color} roughnessMap={wallGrain} bumpMap={wallBump} bumpScale={0.006} roughness={0.92} />
+    <meshStandardMaterial color={group.right.color} roughnessMap={wallGrain} bumpMap={wallBump} bumpScale={0.035} roughness={0.92} metalness={0} />
   );
 
   return (
@@ -292,30 +350,35 @@ function RoomUnit({
 
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, ROOM_HEIGHT, -ROOM_DEPTH / 2]}>
         <planeGeometry args={[ROOM_WIDTH, ROOM_DEPTH]} />
-        <meshStandardMaterial color="#F2F2F0" roughness={0.95} />
+        <meshStandardMaterial color="#FAF9F6" roughness={0.95} />
       </mesh>
 
+      {/* Far wall — a real box with thickness. Its INNER face (facing
+          into the room) sits exactly where the old flat plane used to,
+          so every artwork/text position computed against that surface
+          is unaffected — only the wall itself now has visible depth. */}
       {!hasNextRoom ? (
-        <mesh position={[0, ROOM_HEIGHT / 2, -ROOM_DEPTH]}>
-          <planeGeometry args={[ROOM_WIDTH, ROOM_HEIGHT]} />
+        <mesh position={[0, ROOM_HEIGHT / 2, -ROOM_DEPTH - WALL_THICKNESS / 2]} receiveShadow>
+          <boxGeometry args={[ROOM_WIDTH, ROOM_HEIGHT, WALL_THICKNESS]} />
           {farMat}
         </mesh>
       ) : (
         (() => {
           const sideWidth = (ROOM_WIDTH - DOORWAY_WIDTH) / 2;
           const doorTopHeight = ROOM_HEIGHT - DOORWAY_HEIGHT;
+          const farZ = -ROOM_DEPTH - WALL_THICKNESS / 2;
           return (
             <>
-              <mesh position={[-(DOORWAY_WIDTH / 2 + sideWidth / 2), ROOM_HEIGHT / 2, -ROOM_DEPTH]}>
-                <planeGeometry args={[sideWidth, ROOM_HEIGHT]} />
+              <mesh position={[-(DOORWAY_WIDTH / 2 + sideWidth / 2), ROOM_HEIGHT / 2, farZ]} receiveShadow>
+                <boxGeometry args={[sideWidth, ROOM_HEIGHT, WALL_THICKNESS]} />
                 {farMat}
               </mesh>
-              <mesh position={[DOORWAY_WIDTH / 2 + sideWidth / 2, ROOM_HEIGHT / 2, -ROOM_DEPTH]}>
-                <planeGeometry args={[sideWidth, ROOM_HEIGHT]} />
+              <mesh position={[DOORWAY_WIDTH / 2 + sideWidth / 2, ROOM_HEIGHT / 2, farZ]} receiveShadow>
+                <boxGeometry args={[sideWidth, ROOM_HEIGHT, WALL_THICKNESS]} />
                 {farMat}
               </mesh>
-              <mesh position={[0, ROOM_HEIGHT - doorTopHeight / 2, -ROOM_DEPTH]}>
-                <planeGeometry args={[DOORWAY_WIDTH, doorTopHeight]} />
+              <mesh position={[0, ROOM_HEIGHT - doorTopHeight / 2, farZ]} receiveShadow>
+                <boxGeometry args={[DOORWAY_WIDTH, doorTopHeight, WALL_THICKNESS]} />
                 {farMat}
               </mesh>
             </>
@@ -323,32 +386,27 @@ function RoomUnit({
         })()
       )}
 
-      <mesh rotation={[0, Math.PI / 2, 0]} position={[-ROOM_WIDTH / 2, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2]}>
-        <planeGeometry args={[ROOM_DEPTH, ROOM_HEIGHT]} />
+      <mesh position={[-ROOM_WIDTH / 2 - WALL_THICKNESS / 2, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2]} receiveShadow>
+        <boxGeometry args={[WALL_THICKNESS, ROOM_HEIGHT, ROOM_DEPTH]} />
         {leftMat}
       </mesh>
 
-      <mesh rotation={[0, -Math.PI / 2, 0]} position={[ROOM_WIDTH / 2, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2]}>
-        <planeGeometry args={[ROOM_DEPTH, ROOM_HEIGHT]} />
+      <mesh position={[ROOM_WIDTH / 2 + WALL_THICKNESS / 2, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2]} receiveShadow>
+        <boxGeometry args={[WALL_THICKNESS, ROOM_HEIGHT, ROOM_DEPTH]} />
         {rightMat}
       </mesh>
 
-      <mesh position={[0, 0.06, -ROOM_DEPTH + 0.02]}>
-        <planeGeometry args={[ROOM_WIDTH, 0.12]} />
-        <meshStandardMaterial color="#1A1A18" roughness={0.6} />
-      </mesh>
-      <mesh rotation={[0, Math.PI / 2, 0]} position={[-ROOM_WIDTH / 2 + 0.02, 0.06, -ROOM_DEPTH / 2]}>
-        <planeGeometry args={[ROOM_DEPTH, 0.12]} />
-        <meshStandardMaterial color="#1A1A18" roughness={0.6} />
-      </mesh>
-      <mesh rotation={[0, -Math.PI / 2, 0]} position={[ROOM_WIDTH / 2 - 0.02, 0.06, -ROOM_DEPTH / 2]}>
-        <planeGeometry args={[ROOM_DEPTH, 0.12]} />
-        <meshStandardMaterial color="#1A1A18" roughness={0.6} />
-      </mesh>
+      {/* Black baseboard trim removed entirely — it was reading as a
+          thick game-like outline framing the whole room. */}
 
+      {/* Ceiling cove trim — a plain, non-emissive physical strip now.
+          The glow/hotspot came from this being a light source itself;
+          the actual illumination comes from the real ceiling spotlights
+          below, this is just the architectural fixture they're mounted
+          near. */}
       <mesh position={[0, ROOM_HEIGHT - 0.03, -ROOM_DEPTH + 0.35]}>
-        <planeGeometry args={[ROOM_WIDTH - 0.6, 0.12]} />
-        <meshStandardMaterial color="#FFFFFF" emissive="#FFF8E8" emissiveIntensity={1.4} />
+        <planeGeometry args={[ROOM_WIDTH - 0.6, 0.1]} />
+        <meshStandardMaterial color="#EDEAE1" roughness={0.7} />
       </mesh>
 
       {isFirst && (
@@ -391,16 +449,36 @@ function ArtworkFrame({
 
   const safeY = Math.max(position[1], artHeight / 2 + 0.5);
   const adjustedPosition: [number, number, number] = [position[0], safeY, position[2]];
-  const frameThickness = 0.05;
+  const frameBorder = 0.05;
+  const frameDepth = 0.03;
+
+  // A real physical gap between the wall and the mounted piece — the
+  // whole assembly (shadow + frame + artwork) stands proud of the wall
+  // surface, rather than sitting flush against it.
+  const wallGap = 0.05;
 
   return (
     <group position={adjustedPosition} rotation={[0, rotationY, 0]}>
-      <mesh position={[0, 0, -0.012]}>
-        <planeGeometry args={[artWidth + frameThickness * 2, artHeight + frameThickness * 2]} />
-        <meshStandardMaterial color="#1C1C1A" roughness={0.4} metalness={0.2} />
+      {/* A static soft shadow cast onto the wall behind the piece.
+          Deliberately NOT a real shadow-casting light — dynamic shadows
+          per artwork were the exact cause of the earlier GPU crash with
+          several pieces on screen at once. This is a cheap, always-on
+          approximation that gives the same "it's mounted with a gap"
+          read without that cost. */}
+      <mesh position={[0.03, -0.04, -wallGap + 0.002]}>
+        <planeGeometry args={[artWidth + frameBorder * 2 + 0.14, artHeight + frameBorder * 2 + 0.14]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.22} />
       </mesh>
 
+      {/* The frame — a real box with depth, not a flat backing plane */}
+      <mesh position={[0, 0, -wallGap + frameDepth / 2]}>
+        <boxGeometry args={[artWidth + frameBorder * 2, artHeight + frameBorder * 2, frameDepth]} />
+        <meshStandardMaterial color="#1C1C1A" roughness={0.4} metalness={0.25} />
+      </mesh>
+
+      {/* The artwork itself, seated just in front of the frame's face */}
       <mesh
+        position={[0, 0, -wallGap + frameDepth + 0.004]}
         onClick={(e) => {
           e.stopPropagation();
           onSelect({ position, rotationY });
@@ -408,7 +486,10 @@ function ArtworkFrame({
         onPointerOver={() => (document.body.style.cursor = 'pointer')}
         onPointerOut={() => (document.body.style.cursor = 'auto')}
       >
-        <planeGeometry args={[artWidth, artHeight]} />
+        {/* A thin box instead of a flat plane — the canvas has a real
+            edge visible at an angle, like an actual stretched-canvas
+            piece, not a poster stuck to the wall. */}
+        <boxGeometry args={[artWidth, artHeight, 0.018]} />
         <meshStandardMaterial
           map={texture}
           roughness={0.35}
@@ -418,12 +499,21 @@ function ArtworkFrame({
       </mesh>
 
       {title && (
-        <Text position={[0, -artHeight / 2 - 0.18, 0]} fontSize={0.09} color="white" anchorX="center" anchorY="top" maxWidth={artWidth} font="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-normal.woff">
+        <Text position={[0, -artHeight / 2 - 0.18, -wallGap + frameDepth]} fontSize={0.09} color="white" anchorX="center" anchorY="top" maxWidth={artWidth} font="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-normal.woff">
           {title}
         </Text>
       )}
 
-      <spotLight position={[0, 1.4, 1.4]} target-position={[0, 0, 0]} angle={0.65} penumbra={0.9} intensity={6} distance={5} />
+      <spotLight
+        position={[0, 1.4, 1.2]}
+        target-position={[0, 0, 0]}
+        angle={0.45}
+        penumbra={0.7}
+        intensity={11}
+        distance={4}
+        decay={2}
+        color="#FFF4E0"
+      />
     </group>
   );
 }
@@ -438,26 +528,27 @@ function WallTextPanel({
   slot,
   hasDoorway,
   textPosition = 'top',
-  textSize = 'medium',
+  textSize = 24,
+  textFont = 'inter',
+  wallColor,
 }: {
   heading: string;
   body?: string;
   slot: 'far' | 'left' | 'right';
   hasDoorway: boolean;
   textPosition?: 'top' | 'center' | 'bottom';
-  textSize?: 'small' | 'medium' | 'large';
+  textSize?: number;
+  textFont?: 'inter' | 'playfair' | 'merriweather' | 'mono';
+  wallColor: string;
 }) {
   let x: number;
   let z: number;
   let rotationY: number;
-  let widthBudget = 2.6; // how wide the text block is allowed to run
+  let widthBudget = 2.6;
 
   if (slot === 'far') {
     const sideWidth = (ROOM_WIDTH - DOORWAY_WIDTH) / 2;
     if (hasDoorway) {
-      // Centred in its own half of the wall, sized to genuinely match
-      // the artwork on the other half — a real 50/50 split, not a small
-      // label off to the side.
       x = -(DOORWAY_WIDTH / 2 + sideWidth / 2);
       widthBudget = sideWidth - 0.7;
     } else {
@@ -475,52 +566,64 @@ function WallTextPanel({
     rotationY = -Math.PI / 2;
   }
 
-  // On the split entrance wall, vertically centre the text at the same
-  // height as the artwork opposite it, so the two halves read as equals
-  // side by side — the admin's textPosition still applies elsewhere.
   const yByPosition = { top: ROOM_HEIGHT / 2 + 0.3, center: ART_HEIGHT + 0.2, bottom: 0.9 };
-  const y = hasDoorway ? ART_HEIGHT + 0.3 : yByPosition[textPosition];
-  const scaleBySize = { small: 0.7, medium: 0.9, large: 1.2 };
-  const scale = scaleBySize[textSize];
+  // Always respect the admin's textPosition choice — it was being
+  // silently overridden on any wall with a doorway, which is why
+  // changing the setting appeared to have no effect.
+  const y = yByPosition[textPosition];
+
+  // Stronger size contrast between title and body — the title should
+  // read as clearly dominant, not just "slightly bigger" than the copy.
+  // Stronger default scale and hierarchy — the title reads clearly as
+  // "EXHIBITION TITLE" against the smaller supporting text, per real
+  // museum signage conventions.
+  const headingSize = (textSize / 100) * 1.35;
+  const bodySize = (textSize / 100) * 0.48;
   const hasHeading = heading.length > 0;
   const textOriginX = hasDoorway ? -widthBudget / 2 : 0;
-  const anchorX = hasDoorway ? 'left' : 'left';
+  const regularFontUrl = FONT_URLS[textFont] || FONT_URLS.inter;
+  const boldFontUrl = FONT_URLS_BOLD[textFont] || FONT_URLS_BOLD.inter;
+  const { title: titleColor, body: bodyColor } = getTextColors(wallColor);
+
+  // Standing slightly off the wall — like a printed panel mounted a few
+  // millimetres proud of the surface, not a decal glued flat onto it.
+  const standoff = 0.06;
 
   return (
-    <group position={[x, y, z]} rotation={[0, rotationY, 0]}>
-      <mesh position={[textOriginX - 0.12, -0.15 * scale, -0.01]}>
-        <planeGeometry args={[0.025, 0.75 * scale]} />
-        <meshBasicMaterial color="#1A1A18" />
+    <group position={[x, y, z + (rotationY === 0 ? standoff : 0)]} rotation={[0, rotationY, 0]}>
+      {/* A thin rule under the title — common in real exhibition
+          signage to separate the title from the body copy. No glow,
+          no transparency: a plain, solid, editorial line. */}
+      <mesh position={[textOriginX, hasHeading ? -0.08 : -0.08, 0]}>
+        <planeGeometry args={[widthBudget * 0.5, 0.012]} />
+        <meshBasicMaterial color={titleColor} />
       </mesh>
 
       {hasHeading && (
         <Text
-          position={[textOriginX, 0.45 * scale, 0]}
-          fontSize={0.24 * scale}
-          color="white"
-          anchorX={anchorX}
+          position={[textOriginX, 0.45 * (headingSize / 0.24), 0]}
+          fontSize={headingSize}
+          color={titleColor}
+          anchorX="left"
           anchorY="bottom"
           maxWidth={widthBudget}
           lineHeight={1.15}
-          outlineWidth={0.006}
-          outlineColor="#000000"
-          font="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-normal.woff"
+          font={boldFontUrl}
+          letterSpacing={0.01}
         >
           {heading}
         </Text>
       )}
       {body && (
         <Text
-          position={[textOriginX, hasHeading ? 0.22 * scale : 0.45 * scale, 0]}
-          fontSize={0.13 * scale}
-          color="#F0EEE6"
-          anchorX={anchorX}
+          position={[textOriginX, hasHeading ? -0.2 : 0.1, 0]}
+          fontSize={bodySize}
+          color={bodyColor}
+          anchorX="left"
           anchorY={hasHeading ? 'top' : 'bottom'}
           maxWidth={widthBudget}
-          lineHeight={1.5}
-          outlineWidth={0.004}
-          outlineColor="#000000"
-          font="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-normal.woff"
+          lineHeight={1.6}
+          font={regularFontUrl}
         >
           {body}
         </Text>
@@ -624,6 +727,8 @@ function GalleryScene({
                   hasDoorway={hasDoorway}
                   textPosition={wall.textPosition}
                   textSize={wall.textSize}
+                  textFont={wall.textFont}
+                  wallColor={wall.color}
                 />
               );
             })}
@@ -810,7 +915,14 @@ export default function VirtualGallery() {
     );
   }
 
-  const wallSettings = exhibition.wallSettings && exhibition.wallSettings.length > 0 ? exhibition.wallSettings : [FALLBACK_WALL];
+  // New exhibitions store the proper rooms→walls hierarchy (exhibition.rooms).
+  // Older ones, saved before this migration, only have the flat
+  // wallSettings array — both are supported so nothing existing breaks.
+  const wallSettings = exhibition.rooms?.length
+    ? flattenRoomsData(exhibition.rooms)
+    : exhibition.wallSettings && exhibition.wallSettings.length > 0
+      ? exhibition.wallSettings
+      : [FALLBACK_WALL];
   const rooms = groupWallsIntoRooms(wallSettings);
   const totalRooms = rooms.length;
   const roomTransforms = getRoomTransforms(totalRooms);
@@ -828,16 +940,44 @@ export default function VirtualGallery() {
         <button className="galleryZoomOutBtn" onClick={() => setZoomed(null)}>← Step back</button>
       )}
 
-      <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 1.6, 6], fov: 60 }}>
+      <Canvas
+        shadows
+        dpr={[1, 2]}
+        camera={{ position: [0, 1.6, 6], fov: 60 }}
+        gl={{ toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
+      >
         <Suspense fallback={null}>
-          <ambientLight intensity={1.15} />
-          <hemisphereLight args={['#FFFFFF', '#6B675E', 0.65]} />
-          <directionalLight position={[5, 9, 3]} intensity={0.5} castShadow shadow-mapSize={[512, 512]} />
+          {/* Ambient: only enough to keep unlit corners from going pure
+              black — it must NOT be the room's main light source. */}
+          <ambientLight intensity={0.58} />
+          <hemisphereLight args={['#FFFFFF', '#3A3830', 0.4]} />
+
+          {/* A single soft directional fill, standing in for daylight
+              through a gallery skylight — gentle, not a spotlight. */}
+          <directionalLight position={[5, 9, 3]} intensity={0.42} castShadow shadow-mapSize={[1024, 1024]} />
+
+          {/* Ceiling gallery spotlights — two per room, aimed down from
+              the ceiling (physically tied to the architecture, not a
+              floating point light), giving pools of brighter light with
+              real falloff instead of one flat glow across the room. */}
           {roomTransforms.map((t, i) => {
-            const worldCenter = new THREE.Vector3(0, ROOM_HEIGHT - 0.3, -ROOM_DEPTH / 2)
-              .applyAxisAngle(new THREE.Vector3(0, 1, 0), t.angle)
-              .add(t.position);
-            return <pointLight key={i} position={worldCenter.toArray()} intensity={5} distance={12} decay={2} />;
+            const mk = (localX: number, localZ: number) => {
+              const p = new THREE.Vector3(localX, ROOM_HEIGHT - 0.15, localZ)
+                .applyAxisAngle(new THREE.Vector3(0, 1, 0), t.angle)
+                .add(t.position);
+              const target = new THREE.Vector3(localX, 0, localZ)
+                .applyAxisAngle(new THREE.Vector3(0, 1, 0), t.angle)
+                .add(t.position);
+              return { p, target };
+            };
+            const a = mk(-2, -ROOM_DEPTH * 0.3);
+            const b = mk(2, -ROOM_DEPTH * 0.7);
+            return (
+              <group key={i}>
+                <spotLight position={a.p.toArray()} target-position={a.target.toArray()} angle={0.68} penumbra={0.7} intensity={22} distance={10} decay={1.8} color="#FFF6E8" />
+                <spotLight position={b.p.toArray()} target-position={b.target.toArray()} angle={0.68} penumbra={0.7} intensity={22} distance={10} decay={1.8} color="#FFF6E8" />
+              </group>
+            );
           })}
 
           <GalleryScene

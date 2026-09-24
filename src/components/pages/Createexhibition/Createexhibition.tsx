@@ -12,7 +12,8 @@ interface Artist {
 
 type ContentType = 'artOnly' | 'textOnly' | 'both';
 type TextPosition = 'top' | 'center' | 'bottom';
-type TextSize = 'small' | 'medium' | 'large';
+
+type TextFont = 'inter' | 'playfair' | 'merriweather' | 'mono';
 
 interface WallSetting {
   id: string; // e.g. 'wall-1' — open-ended, admin adds as many as needed
@@ -21,16 +22,37 @@ interface WallSetting {
   wallText: string;
   maxArtworks: number;
   textPosition: TextPosition;
-  textSize: TextSize;
+  textSize: number; // exact size, not a preset
+  textFont: TextFont;
+}
+
+// The form still edits a simple flat list of walls (unchanged UX) — these
+// two helpers convert to/from the backend's proper rooms→walls hierarchy
+// only at the save/load boundary, so the data model is clean without
+// complicating the editing experience.
+type Slot = 'far' | 'left' | 'right';
+const SLOTS: Slot[] = ['far', 'left', 'right'];
+
+function wallsToRooms(walls: WallSetting[]) {
+  const rooms: { id: string; walls: (WallSetting & { slot: Slot })[] }[] = [];
+  for (let i = 0; i < walls.length; i += 3) {
+    const chunk = walls.slice(i, i + 3).map((w, j) => ({ ...w, slot: SLOTS[j] }));
+    rooms.push({ id: "room-" + (rooms.length + 1), walls: chunk });
+  }
+  return rooms;
+}
+
+function roomsToWalls(rooms: { id: string; walls: WallSetting[] }[]): WallSetting[] {
+  return rooms.flatMap((r) => r.walls);
 }
 
 // Realistic gallery paint tones as starting defaults — admins can still
 // pick any colour, but these read as real architectural choices rather
 // than arbitrary CSS colours.
 const defaultWallSettings: WallSetting[] = [
-  { id: 'wall-1', color: '#F2EFE7', contentType: 'both', wallText: '', maxArtworks: 4, textPosition: 'top', textSize: 'medium' },
-  { id: 'wall-2', color: '#EDEAE1', contentType: 'artOnly', wallText: '', maxArtworks: 6, textPosition: 'top', textSize: 'medium' },
-  { id: 'wall-3', color: '#2B2A28', contentType: 'artOnly', wallText: '', maxArtworks: 6, textPosition: 'top', textSize: 'medium' },
+  { id: 'wall-1', color: '#F5F3EE', contentType: 'both', wallText: '', maxArtworks: 4, textPosition: 'top', textSize: 24, textFont: 'inter' },
+  { id: 'wall-2', color: '#F5F3EE', contentType: 'artOnly', wallText: '', maxArtworks: 6, textPosition: 'top', textSize: 24, textFont: 'inter' },
+  { id: 'wall-3', color: '#2B2A28', contentType: 'artOnly', wallText: '', maxArtworks: 6, textPosition: 'top', textSize: 24, textFont: 'inter' },
 ];
 
 function nextWallId(existing: WallSetting[]) {
@@ -148,7 +170,7 @@ export default function CreateExhibition() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, description, startDate, endDate, artistId, image, artworks, wallSettings }),
+        body: JSON.stringify({ title, description, startDate, endDate, artistId, image, artworks, rooms: wallsToRooms(wallSettings) }),
       });
 
       const data = await response.json();
@@ -233,12 +255,13 @@ export default function CreateExhibition() {
                         ...wallSettings,
                         {
                           id: nextWallId(wallSettings),
-                          color: '#F2EFE7',
+                          color: '#F5F3EE',
                           contentType: 'artOnly',
                           wallText: '',
                           maxArtworks: 6,
                           textPosition: 'top',
-                          textSize: 'medium',
+                          textSize: 24,
+                          textFont: 'inter',
                         },
                       ]);
                     }}
@@ -316,20 +339,37 @@ export default function CreateExhibition() {
                           </div>
 
                           <div className="wallSettingRow">
-                            <label>Text size</label>
-                            <select
+                            <label>Text size (pt)</label>
+                            <input
+                              type="number"
+                              min={8}
+                              max={72}
                               value={wall.textSize}
                               onChange={(e) => {
                                 const updated = [...wallSettings];
-                                updated[index] = { ...updated[index], textSize: e.target.value as TextSize };
+                                updated[index] = { ...updated[index], textSize: Number(e.target.value) };
+                                setWallSettings(updated);
+                              }}
+                            />
+                          </div>
+
+                          <div className="wallSettingRow">
+                            <label>Font</label>
+                            <select
+                              value={wall.textFont}
+                              onChange={(e) => {
+                                const updated = [...wallSettings];
+                                updated[index] = { ...updated[index], textFont: e.target.value as TextFont };
                                 setWallSettings(updated);
                               }}
                             >
-                              <option value="small">Small</option>
-                              <option value="medium">Medium</option>
-                              <option value="large">Large</option>
+                              <option value="inter">Inter (clean sans-serif)</option>
+                              <option value="playfair">Playfair Display (elegant serif)</option>
+                              <option value="merriweather">Merriweather (classic serif)</option>
+                              <option value="mono">Roboto Mono (typewriter)</option>
                             </select>
                           </div>
+
                         </>
                       )}
 

@@ -1,0 +1,28 @@
+/* src/components/pages/TestGalleryRoom/TestGalleryRoom.css */
+
+.testRoomViewport {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #111;
+}
+
+.testRoomViewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.testRoomHint {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  pointer-events: none;
+}
