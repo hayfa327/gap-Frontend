@@ -88,7 +88,7 @@ export default function Login() {
   const loginDemo = (role: Role) => {
     const demoCredentials: Record<Role, { email: string; password: string }> = {
       admin: { email: 'admin@test.com', password: 'Admin123' },
-      artist: { email: 'artist@test.com', password: 'Artist123' },
+      artist: { email: 'artist@test.com', password:"Hh12345@" },
       visitor: { email: 'visitor@test.com', password: 'Visitor123' },
     };
     performLogin(demoCredentials[role]);
