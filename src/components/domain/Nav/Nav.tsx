@@ -1,10 +1,9 @@
 // src/components/domain/Nav/Nav.tsx
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './nav.css';
 
 const navLinks = [
-  { label: 'Live', href: '/live' },
   { label: 'Exhibitions', href: '/exhibitions' },
   { label: 'Performances & concerts', href: '/performances' },
   { label: 'Calendar', href: '/calendar' },
@@ -19,7 +18,6 @@ export function Nav() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role') as Role | null;
@@ -51,7 +49,9 @@ export function Nav() {
     localStorage.removeItem('role');
     setAccountOpen(false);
     setMobileOpen(false);
-    navigate('/login');
+    // Stay on the current page instead of forcing a redirect to /login —
+    // the page will simply reflect the logged-out state (e.g. the nav
+    // switches back to showing "Sign in").
   };
 
   const accountLinks = (
@@ -108,31 +108,38 @@ export function Nav() {
       </nav>
 
       <div className="nav-actions">
-        <span className="live-pill">
-          <span className="live-dot" />
-          Live now
-        </span>
+        {/* Always visible — desktop AND mobile — unlike the old account
+            dropdown, which was hidden below 900px, leaving mobile users
+            with no visible way to sign in until they opened the burger
+            menu. Logged-in users still get the full account dropdown
+            with Manage Account / My Art / Admin / Logout. */}
+        {!isLoggedIn && (
+          <Link to="/login" className="nav-signin-btn">
+            Sign in
+          </Link>
+        )}
 
-        {/* Desktop account dropdown — hidden on mobile via CSS */}
-        <div className="nav-account" ref={menuRef}>
-          <button className="nav-account-trigger" onClick={() => setAccountOpen((v) => !v)}>
-            <span aria-hidden="true">&#128100;</span>
-            {isLoggedIn ? role : 'Sign in'}
-          </button>
+        {isLoggedIn && (
+          <div className="nav-account" ref={menuRef}>
+            <button className="nav-account-trigger" onClick={() => setAccountOpen((v) => !v)}>
+              <span aria-hidden="true">&#128100;</span>
+              {role}
+            </button>
 
-          {accountOpen && <div className="nav-dropdown">{accountLinks}</div>}
-        </div>
+            {accountOpen && <div className="nav-dropdown">{accountLinks}</div>}
+          </div>
+        )}
 
-        {/* Mobile hamburger — hidden on desktop via CSS. Morphs into an X when open. */}
+        {/* Mobile menu toggle — hidden on desktop via CSS. Plain text,
+            no icon, to match the site's minimal editorial typography
+            instead of a generic app-style hamburger glyph. */}
         <button
-          className={mobileOpen ? 'nav-burger nav-burger-open' : 'nav-burger'}
-          aria-label={mobileOpen ? 'Close menu' : 'Menu'}
+          className="nav-menu-toggle"
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((v) => !v)}
         >
-          <span />
-          <span />
-          <span />
+          {mobileOpen ? 'Close' : 'Menu'}
         </button>
       </div>
 
