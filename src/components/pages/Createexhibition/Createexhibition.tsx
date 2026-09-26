@@ -42,9 +42,6 @@ function wallsToRooms(walls: WallSetting[]) {
   return rooms;
 }
 
-function roomsToWalls(rooms: { id: string; walls: WallSetting[] }[]): WallSetting[] {
-  return rooms.flatMap((r) => r.walls);
-}
 
 // Realistic gallery paint tones as starting defaults — admins can still
 // pick any colour, but these read as real architectural choices rather
