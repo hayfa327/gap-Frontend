@@ -427,6 +427,7 @@ function ArtworkFrame({
   rotationY,
   maxSize,
   selected,
+  lightsOn,
   onSelect,
 }: {
   imageUrl: string;
@@ -435,6 +436,7 @@ function ArtworkFrame({
   rotationY: number;
   maxSize: number;
   selected: boolean;
+  lightsOn: boolean;
   onSelect: (info: { position: [number, number, number]; rotationY: number }) => void;
 }) {
   const texture = useSharpTexture(imageUrl);
@@ -504,16 +506,22 @@ function ArtworkFrame({
         </Text>
       )}
 
-      <spotLight
-        position={[0, 1.4, 1.2]}
-        target-position={[0, 0, 0]}
-        angle={0.45}
-        penumbra={0.7}
-        intensity={11}
-        distance={4}
-        decay={2}
-        color="#FFF4E0"
-      />
+      {/* Only lit when this artwork's room is within the active light
+          budget (see GalleryLightsAndScene) — every room's artworks still
+          render fully, they just fall back to ambient/hemisphere/ceiling
+          light instead of their own spotlight when the camera is far away. */}
+      {lightsOn && (
+        <spotLight
+          position={[0, 1.4, 1.2]}
+          target-position={[0, 0, 0]}
+          angle={0.45}
+          penumbra={0.7}
+          intensity={11}
+          distance={4}
+          decay={2}
+          color="#FFF4E0"
+        />
+      )}
     </group>
   );
 }
@@ -644,6 +652,7 @@ function GalleryScene({
   zoomed,
   setZoomed,
   roomTransforms,
+  isRoomLit,
 }: {
   wallSettings: WallSetting[];
   artworks: ArtworkData[];
@@ -652,6 +661,7 @@ function GalleryScene({
   zoomed: { position: [number, number, number]; rotationY: number } | null;
   setZoomed: (v: { position: [number, number, number]; rotationY: number } | null) => void;
   roomTransforms: RoomTransform[];
+  isRoomLit: (roomIdx: number) => boolean;
 }) {
   const floorTexture = useConcreteFloorTexture();
   const floorBump = useConcreteBumpTexture();
@@ -742,6 +752,7 @@ function GalleryScene({
                 rotationY={p.localRotationY}
                 maxSize={p.maxSize}
                 selected={zoomed?.position === p.local}
+                lightsOn={isRoomLit(roomIdx)}
                 onSelect={(info) => {
                   const worldPos = localToWorld(info.position, transform);
                   setZoomed({ position: worldPos, rotationY: transform.angle + info.rotationY });
@@ -867,6 +878,74 @@ function SceneJumper({ target }: { target: { position: THREE.Vector3; angle: num
 }
 
 // --------------------------------------------------------------------------
+// Light budget — only the room the camera is in, plus its immediate
+// neighbours, keeps its ceiling spotlights and per-artwork spotlights live.
+// Every extra simultaneously-lit room multiplies the total light count the
+// shader has to compile in one pass; with several rooms x (2 ceiling +
+// 1-per-artwork) that exceeded what some GPU drivers can handle, which is
+// what crashed the renderer with "Context Lost" once a bigger exhibition
+// went live. Distant rooms still render fully — they just fall back to
+// ambient/hemisphere/directional light instead of their own spotlights.
+// --------------------------------------------------------------------------
+
+function GalleryLightsAndScene(props: {
+  wallSettings: WallSetting[];
+  artworks: ArtworkData[];
+  exhibitionTitle: string;
+  exhibitionDescription?: string;
+  zoomed: { position: [number, number, number]; rotationY: number } | null;
+  setZoomed: (v: { position: [number, number, number]; rotationY: number } | null) => void;
+  roomTransforms: RoomTransform[];
+}) {
+  const { camera } = useThree();
+  const [activeRoom, setActiveRoom] = useState(0);
+  const margin = 0.6;
+
+  useFrame(() => {
+    const idx = findCurrentRoom(camera.position, props.roomTransforms, margin);
+    if (idx !== activeRoom) setActiveRoom(idx);
+  });
+
+  const isRoomLit = (roomIdx: number) => Math.abs(roomIdx - activeRoom) <= 1;
+
+  return (
+    <>
+      {props.roomTransforms.map((t, i) => {
+        if (!isRoomLit(i)) return null;
+        const mk = (localX: number, localZ: number) => {
+          const p = new THREE.Vector3(localX, ROOM_HEIGHT - 0.15, localZ)
+            .applyAxisAngle(new THREE.Vector3(0, 1, 0), t.angle)
+            .add(t.position);
+          const target = new THREE.Vector3(localX, 0, localZ)
+            .applyAxisAngle(new THREE.Vector3(0, 1, 0), t.angle)
+            .add(t.position);
+          return { p, target };
+        };
+        const a = mk(-2, -ROOM_DEPTH * 0.3);
+        const b = mk(2, -ROOM_DEPTH * 0.7);
+        return (
+          <group key={i}>
+            <spotLight position={a.p.toArray()} target-position={a.target.toArray()} angle={0.68} penumbra={0.7} intensity={22} distance={10} decay={1.8} color="#FFF6E8" />
+            <spotLight position={b.p.toArray()} target-position={b.target.toArray()} angle={0.68} penumbra={0.7} intensity={22} distance={10} decay={1.8} color="#FFF6E8" />
+          </group>
+        );
+      })}
+
+      <GalleryScene
+        wallSettings={props.wallSettings}
+        artworks={props.artworks}
+        exhibitionTitle={props.exhibitionTitle}
+        exhibitionDescription={props.exhibitionDescription}
+        zoomed={props.zoomed}
+        setZoomed={props.setZoomed}
+        roomTransforms={props.roomTransforms}
+        isRoomLit={isRoomLit}
+      />
+    </>
+  );
+}
+
+// --------------------------------------------------------------------------
 // Page
 // --------------------------------------------------------------------------
 
@@ -956,31 +1035,10 @@ export default function VirtualGallery() {
               through a gallery skylight — gentle, not a spotlight. */}
           <directionalLight position={[5, 9, 3]} intensity={0.42} castShadow shadow-mapSize={[1024, 1024]} />
 
-          {/* Ceiling gallery spotlights — two per room, aimed down from
-              the ceiling (physically tied to the architecture, not a
-              floating point light), giving pools of brighter light with
-              real falloff instead of one flat glow across the room. */}
-          {roomTransforms.map((t, i) => {
-            const mk = (localX: number, localZ: number) => {
-              const p = new THREE.Vector3(localX, ROOM_HEIGHT - 0.15, localZ)
-                .applyAxisAngle(new THREE.Vector3(0, 1, 0), t.angle)
-                .add(t.position);
-              const target = new THREE.Vector3(localX, 0, localZ)
-                .applyAxisAngle(new THREE.Vector3(0, 1, 0), t.angle)
-                .add(t.position);
-              return { p, target };
-            };
-            const a = mk(-2, -ROOM_DEPTH * 0.3);
-            const b = mk(2, -ROOM_DEPTH * 0.7);
-            return (
-              <group key={i}>
-                <spotLight position={a.p.toArray()} target-position={a.target.toArray()} angle={0.68} penumbra={0.7} intensity={22} distance={10} decay={1.8} color="#FFF6E8" />
-                <spotLight position={b.p.toArray()} target-position={b.target.toArray()} angle={0.68} penumbra={0.7} intensity={22} distance={10} decay={1.8} color="#FFF6E8" />
-              </group>
-            );
-          })}
-
-          <GalleryScene
+          {/* Ceiling gallery spotlights + per-artwork spotlights, capped to
+              the current room and its immediate neighbours — see
+              GalleryLightsAndScene above. */}
+          <GalleryLightsAndScene
             wallSettings={wallSettings}
             artworks={artworks}
             exhibitionTitle={exhibition.title}
