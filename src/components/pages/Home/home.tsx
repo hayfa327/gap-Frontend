@@ -1,7 +1,7 @@
 import { HeroTitle } from '../Home/herotitle/herotitle';
 import { Footer} from '../../domain/Footer/Footer';
 import { Nav } from '../../domain/Nav/Nav';
-import heroImage from '../../../assets/herotitle.jpeg';
+import heroImage from '../../../assets/herotitle.jpg';
 import { CurrentExhibition } from '../../domain/CurrentExhibition/CurrentExhibition';
 import { PerformancesSection } from '../../domain/PerformanceSection/PerformanceSection';  
 import { ArtistsSection } from '../../domain/Artistssection/Artistssection';

@@ -17,6 +17,9 @@ import KidsCorner from './components/pages/KidsCorner/KidsCorner'
 import VirtualGallery from './components/pages/VirtualGallery/VirtualGallery'
 import EditExhibition from './components/pages/EditExhibition/EditExhibition'
 import TestGalleryRoom from './components/pages/TestGalleryRoom/TestGalleryRoom';
+import PerformanceDetail from './components/pages/PerformanceDetail/PerformanceDetail';
+import EditPerformance from './components/pages/EditPerformance/EditPerformance';
+import CalendarPage from './components/pages/calendar/calendar'
  
 
 
@@ -83,6 +86,18 @@ export default function App() {
   }
 />
 <Route path="/test-room" element={<TestGalleryRoom />} />
+<Route path="/performances/:id" element={<PerformanceDetail />} />
+
+<Route
+  path="/performances/:id/edit"
+  element={
+    <ProtectedRoute allowedRoles={['admin']}>
+      <EditPerformance />
+    </ProtectedRoute>
+  }
+/>
+<Route path="/calendar" element={<CalendarPage />} />
+
     </Routes>  
   );
       

@@ -6,7 +6,7 @@ import './nav.css';
 const navLinks = [
   { label: 'Live', href: '/live' },
   { label: 'Exhibitions', href: '/exhibitions' },
-  { label: 'Performances', href: '/performances' },
+  { label: 'Performances & concerts', href: '/performances' },
   { label: 'Calendar', href: '/calendar' },
   { label: 'Artists', href: '/artists' },
   { label: 'Kids', href: '/kids-corner' },
